@@ -39,27 +39,27 @@ be checked:
 **Prompt sent** (should be exactly one sentence):
 
 ```
-
+Write Python code to analyze student marks.
 ```
 
 **Assumptions the AI made that I never gave it** — list them, one per line. A data format, a pass
 threshold, a rounding rule, an input method, an invented feature all count.
 
-1.
-2.
-3.
+1.Computes average, median, and standard deviation
+2.Assigns letter grades and tallies the distribution
+3.Splits students into pass/fail groups (default pass mark: 50)
 
 **Questions it should have asked and did not:**
 
-1.
-2.
+1.What inputs and outputs are needed?
+2.Do I need a full website or just code?
 
 **Is the function named `analyze_marks` with the required signature?** yes / no — if no, what is it
-called:
+called: no, there are no function like this at all
 
-**First impression before testing** (one sentence — you will compare this with section 6 later):
+**First impression before testing** (one sentence — you will compare this with section 6 later):Generally the is correct. There are all the needed outputs and parametrs.
 
----
+--- 
 
 ## 3. Prompt B — structured context
 

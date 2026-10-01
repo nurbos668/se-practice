@@ -1,0 +1,52 @@
+# week-04/submission.yml — your declaration for this lab.
+#
+# Facts only. Every explanation goes in lab-report.md; nothing here repeats prose.
+# Fill every value. Check it before you push:
+#
+#     python tests/validate_submission.py
+
+schema: 1
+week: "04"
+
+student:
+  name: Tajikossov Nurbolsyn
+  student_id: 24B032042
+  github: nurbos668
+
+assistant:
+  tool: Gemini
+  model: Gemini Flash 3.6
+
+counts:
+  behaviour_diagram: activity
+  stories_source: reference
+  use_cases: 6
+  change_log_rows: 5
+
+checker:
+  # Numbers from YOUR last run of: python tests/check_models.py
+  pass:
+  fail:
+  error:
+  commit:
+  kept_fails: []
+
+assumptions:
+  # allowed = a booking ending 14:00 and one starting 14:00 can both exist (touching is not an overlap)
+  overlap_touching_bookings: allowed
+  blocking_a_booked_room: keep-bookings
+
+traceability:
+  use_cases_not_traced: []
+  rules_not_shown: []
+
+review_findings:
+  - "Use case Receive booking confirmation was a system outcome (R4), not an actor goal, and its include had no why comment - removed"
+  - "Class Administrator and its 0..* to 0..* association with Room were not required by US-04 or US-05 - removed"
+  - "Class Booking had no startTime or endTime (R1, R2) and TimeSlot was split off 1 to 1 - times moved into Booking, R2 note added"
+  - "Activity guards were typed (yes) and (no) without brackets and the R1 reject text did not name the rule - fixed"
+
+honesty:
+  originals_unedited: yes
+  can_explain_everything_submitted: yes
+  ai_usage_disclosed: yes

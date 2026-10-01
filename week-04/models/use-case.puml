@@ -1,0 +1,26 @@
+@startuml
+left to right direction
+skinparam packageStyle rectangle
+
+actor "Student" as student
+actor "Administrator" as admin
+
+rectangle "Smart Campus Study Room Booking System" {
+  usecase "View room availability" as UC_View
+  usecase "Book room" as UC_Book
+  usecase "Cancel own booking" as UC_Cancel
+  usecase "Block room" as UC_Block
+  usecase "Unblock room" as UC_Unblock
+  usecase "Review room usage" as UC_Review
+}
+
+student --> UC_View
+student --> UC_Book
+student --> UC_Cancel
+
+admin --> UC_Block
+admin --> UC_Unblock
+admin --> UC_Review
+
+note right of UC_Book : R4 - a successful booking produces a confirmation. It is the result of booking, so it is not a separate use case.
+@enduml

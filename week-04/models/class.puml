@@ -1,0 +1,42 @@
+@startuml
+skinparam classAttributeIconSize 0
+
+enum BookingStatus {
+  ACTIVE
+  CANCELLED
+}
+
+class Student {
+  - studentId: String
+  - name: String
+}
+
+class Room {
+  - roomId: String
+  - blocked: Boolean
+  + isAvailable(start: DateTime, end: DateTime): Boolean
+  + block(): void
+  + unblock(): void
+}
+
+class Booking {
+  - bookingId: String
+  - startTime: DateTime
+  - endTime: DateTime
+  - status: BookingStatus
+  + isValid(now: DateTime): Boolean
+  + overlapsWith(other: Booking): Boolean
+  + cancel(): void
+}
+
+Student "1" -- "0..*" Booking : makes >
+Booking "0..*" -- "1" Room : reserves >
+
+note right of Booking
+  R2: active bookings of the same room must not overlap.
+  A multiplicity cannot say this, so it is a rule on Booking.
+  Touching bookings (one ends 12:00, next starts 12:00) do not overlap.
+  R1: startTime is in the future and the length is more than 0 and at most 2 hours.
+  R4: a successful booking produces a confirmation (a message, not a stored class).
+end note
+@enduml

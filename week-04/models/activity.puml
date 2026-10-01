@@ -1,0 +1,29 @@
+@startuml
+skinparam conditionStyle diamond
+
+start
+
+:Student sends a booking request (room, start, end);
+note right: Touching bookings (one ends 12:00, next starts 12:00) do not overlap. Assumption A1.
+
+if (Valid time range? (R1)) then ([yes])
+  if (Room blocked? (R3)) then ([no])
+    if (Overlaps an active booking of this room? (R2)) then ([no])
+      :Create booking with status ACTIVE;
+      :Produce booking confirmation (R4);
+      :Show confirmation to student;
+      stop
+    else ([yes])
+      :Reject booking - time slot is already taken (R2);
+      stop
+    endif
+  else ([yes])
+    :Reject booking - room is blocked (R3);
+    stop
+  endif
+else ([no])
+  :Reject booking - start must be in the future and length 1 minute to 2 hours (R1);
+  stop
+endif
+
+@enduml

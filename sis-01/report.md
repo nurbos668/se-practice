@@ -316,6 +316,8 @@ No source was supplied for the testing claim, the effect of cold on battery rang
 The “12 km each way” figure is an assumption.
 ```
 
+## 9. Appendix C — Evidence tables
+
 ### Verification table
 
 | AI claim | Source and locator | Evidence found | Decision |

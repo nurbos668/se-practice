@@ -37,7 +37,13 @@
 <!-- 350–400 words. Your answer to the question, the trade-offs, and how it applies to your
      scenario. Explain at least two engineering decisions and why they fit the scenario. -->
 
-(write here)
+A drone that delivers medicine to the mountain village needs safeguards in three areas, and each one costs something. For safety, the main design question is what the drone does when it loses its connection over the gorge. The PX4 documentation shows this action is a setting with options such as hold, return or land, so the team must choose it. A single rule of always returning is weak here: the drone may be past the point where its battery can cover the way back, and landing in the gorge would destroy both the drone and the medicine. My first engineering decision is therefore a pre-planned rule that depends on position and remaining charge. It fits this route, where losing the link is expected. The cost is that a rule with several branches is harder to test than one simple behaviour.
+
+My second decision concerns the 25 km range. I assume it is the total distance there and back, so about 12 km each way, and I treat that as a design parameter, not a fact. I would fix a battery reserve in advance and require a recorded reason for any override. The trade-off is that a larger reserve shortens the usable route, and if the village is too far the drone never flies. In that case a mid-route landing point or a human decision is better than cancelling the service, because the village still waits days for medicine.
+
+For privacy, the navigation camera should not simply record everything, but recording nothing would leave no evidence after a crash. My third decision is a short rolling buffer that overwrites itself and is saved only after an incident, with access limited to named staff and an audit log. This follows clause 1.03 of the ACM/IEEE-CS code, which asks engineers to approve software only if it does not diminish privacy.
+
+For accountability, developers answer for their own work (clause 1.01) and should not approve the system unless they believe it is safe and tested (clause 1.03). They are not the only ones responsible: the pharmacy that operates the service and the person who approves each flight also share it. Logging each approval makes this visible. Any legal claim about liability or filming rules is unverified and depends on the real jurisdiction. On link loss, the paramedic and the dispatcher are both alerted (clause 1.04).
 
 ## 3. Review
 
@@ -45,20 +51,24 @@
      checks and your two substantive revisions, each with a reason. Point at the rows of the
      tables in section 9 ("verification row 2", "change-log row 1"). -->
 
-(write here)
+Prompt B returned seven concerns, and I judged each one instead of accepting the list. I qualified point 1: the draft called returning a sensible default, but the PX4 page shows the lost-link action is a configurable setting, so I now treat it as a deliberate choice (verification row 1, change-log row 2). I accepted point 2 and fixed my reading of 25 km as the total distance there and back, about 12 km each way, labelling it an assumption. I qualified point 3: the ACM/IEEE-CS code, clause 1.01, makes developers accountable for their own work, but it does not say who else shares responsibility, so the pharmacy and the flight approver stay an assumption (verification row 2). I accepted point 4 and challenged the draft's own advice on substance: recording nothing leaves no evidence after a crash over the gorge, so I replaced it with a rolling buffer saved only after an incident (change-log row 1). I accepted point 6, because a range that is too short means the drone never flies, and point 7, because the draft ignored the paramedic and the dispatcher. I accepted point 5, that tests cannot prove the absence of faults, but I did not open a source for it, so it is unverified in my answer and I did not use it as a verified fact.
+
+In row 1 I opened the PX4 failsafe page and qualified the claim. In row 2 I opened the ACM/IEEE-CS short code and qualified the responsibility claim. Two revisions followed: the rolling buffer replaced recording nothing, and the fixed return rule became a deliberate choice depending on position and charge.
+
+Remaining gaps: cold-weather battery range, whether drone video is personal data, and legal responsibility were not checked and remain unverified.
 
 ## 4. Conclusion
 
 <!-- 100–150 words. Your recommendation for the scenario and its main limitation. -->
 
-(write here)
+I recommend that the village drone use a pre-planned lost-link rule that depends on position and charge, a fixed battery reserve with a recorded reason for any override, and a rolling camera buffer saved only after an incident. Developers, the pharmacy operator and the flight approver should all be named in an approval log, and both the paramedic and the dispatcher should be alerted when the link is lost. The main limitation is that these choices rest on assumptions: the 12 km each-way range, the effect of cold weather, and the legal rules on liability and filming were not verified, and the testing claim has no source. A real deployment would need measured battery data and a check of the law in the actual jurisdiction.
 
 ## 5. Reflection
 
 <!-- 150–200 words. NOT part of the main total. Written by you, not by the assistant:
      what helped, what you changed, what you learned. Specific beats flattering. -->
 
-(write here)
+The most useful part was Prompt B. The critique found weak spots in the first draft that I had not noticed, for example that recording nothing with the camera would leave no evidence after a crash over the gorge. I did not write the changes myself: the assistant proposed my decisions on the critique and I approved them, so I can explain them only because I read them afterwards. I opened the ACM/IEEE-CS code of ethics myself and read Principle 1, which gave me real clauses (1.01, 1.03, 1.04) to point to instead of trusting the draft. Almost everything in this assignment surprised me, especially how many details an AI answer leaves open, such as what a battery range of 25 km really means. The whole process was inconvenient for me: many steps, strict prompts, and I did most of the work after the deadline had passed. Next time I would start earlier, write my own decisions on the critique, and open the sources before running Prompt C.
 
 ## 6. References
 
@@ -89,31 +99,57 @@
 ### B1 — Draft (Prompt A)
 
 - **Tool:** Claude
-- **Model:** Sonnet 5.5
-- **Date:** (write here)
+- **Model:** Claude Sonnet 5.5
+- **Date:** 2026-10-12
 - **Purpose:** contextual draft
-
-<!-- Model: the exact model with its version, as the tool shows it (e.g. "GPT-5 Thinking",
-     "Claude Sonnet 4.5"). If the tool does not show it, write: not displayed
-     Date: YYYY-MM-DD -->
 
 **Prompt:**
 
 ```text
-(paste here)
+Act as a software engineering tutor. Help me analyze topic 1.10, "What safeguards should a software-controlled drone have for safety, privacy and accountability when it delivers medicine to a mountain village?" for a first-year-level university assignment.
+
+My scenario is a paramedic in the village and a pharmacy dispatcher in the city as users; in winter the only road is closed, so medicine takes days to arrive; the constraints are unreliable mobile coverage on the route and a battery range limited to about 25 km; the risk is that loss of connection over a gorge makes the drone crash, or its navigation camera records residents without consent (the village, pharmacy, range, weather and camera are fictional). My initial ideas are (1) If the connection is lost, the drone should return to where it started. (2) If the drone crashes or films someone, the developers are responsible. (3) Safety versus range depends on the situation: sometimes flying further matters more. (4) Camera video should be stored only for a special command or team. (5) The system should be tested before it is trusted. Draft a 400–500 word explanation using these details.
+
+Separate facts from assumptions. Explain trade-offs and identify claims I should verify. Do not invent quotations, references or page numbers.
 ```
 
 **Response:**
 
 ```text
-(paste here)
+A medicine-delivery drone raises three linked concerns: safety (no harm to people or cargo), privacy (no filming of residents without consent) and accountability (someone answers when things go wrong). I separate facts from assumptions below.
+
+**Facts (general, still to be verified)**
+- Drones often have failsafes, such as returning to a launch point or landing, when the control link is lost.
+- Navigation cameras can capture people incidentally, so video may count as personal data.
+- Testing shows a system works in the cases tried; it cannot prove that no faults remain.
+
+**Assumptions (yours or mine)**
+- The village, pharmacy, range, weather and camera are fictional.
+- I read "25 km" as total distance per battery, so about 12 km each way before any reserve. Please confirm this.
+- Cold winter weather likely reduces the real range below 25 km; this is assumed, not measured.
+
+**Your five ideas**
+1. Return on connection loss: a sensible default, but not always the safest. Over the gorge, returning may be as risky as continuing, and the battery may not cover the return. A pre-planned rule (continue, return or land at the nearest safe site, depending on position and charge) handles more cases but is harder to test than one simple behaviour.
+2. Developers are responsible: they share responsibility for design and testing, but probably not alone. The pharmacy running the service, whoever approves each flight, the manufacturer and the regulator also matter. I treat "developers only" as an unverified assumption. Logging who approved each flight is a design measure that supports accountability.
+3. Safety versus range: decide this trade-off in advance, not mid-flight. A fixed battery reserve shortens deliveries but lowers crash risk. Urgent cases may tempt operators to override it, so an override should need a recorded reason.
+4. Camera storage: it is safer to record nothing by default, use the camera for live navigation, keep footage only after an incident, and restrict access to named staff with an audit log. Less footage makes crash investigation harder but reduces privacy risk.
+5. Testing: agreed, but tests should include lost connection, low battery and wind, first in simulation and then over safe terrain.
+
+**Overall trade-off**
+Every safeguard costs something: a battery reserve costs range, privacy limits cost investigation evidence, and extra rules cost testing effort. For this scenario, accepting a shorter range and less footage in return for lower risk to people looks reasonable, but that judgment depends on the assumptions above.
+
+**Claims to verify**
+- Return-to-home as a standard failsafe, and its known limits.
+- Who is legally responsible for drone accidents and filming in your real jurisdiction (a legal claim; do not rely on me).
+- Whether drone video counts as personal data under the relevant law.
+- How cold weather affects battery range.
 ```
 
 ### B2 — Critique (Prompt B)
 
 - **Tool:** Claude
 - **Model:** Sonnet 5.5
-- **Date:** (write here)
+- **Date:** 2026-10-12
 - **Purpose:** critical review of the draft
 
 **Prompt:**
@@ -197,7 +233,7 @@ Alternative: a relay or landing point mid-route, or a human-approved flight on b
 
 - **Tool:** (Claude)
 - **Model:** Sonnet 5;.5
-- **Date:** (write here)
+- **Date:** 2026-10-12
 - **Purpose:** revision using my decisions and verified evidence
 
 **Prompt:**
@@ -280,20 +316,16 @@ No source was supplied for the testing claim, the effect of cold on battery rang
 The “12 km each way” figure is an assumption.
 ```
 
-## 9. Appendix C — Evidence tables
-
 ### Verification table
 
-<!-- At least two complete rows. Source and locator: title + page / slide / section / chapter,
-     or title + URL + access date (YYYY-MM-DD). Decision: keep, qualify or reject — one word. -->
-
+| AI claim | Source and locator | Evidence found | Decision |
+| --- | --- | --- | --- |
 | Drones often have failsafes, such as returning to a launch point or landing, when the control link is lost. | PX4 Safety (Failsafe) Configuration, section Data Link Loss Failsafe. URL: https://docs.px4.io/v1.16/en/config/safety.html; accessed 2026-10-12 | The page lists several configurable actions for data link loss (disabled, hold, return, land, disarm, terminate) and calls return a common one, so the claim holds only as a configurable choice. | qualify |
 | they share responsibility for design and testing, but probably not alone | ACM/IEEE-CS Software Engineering Code, Principle 1, clauses 1.01 and 1.03. URL: https://www.acm.org/code-of-ethics/software-engineering-code; accessed 2026-10-12 | Clause 1.01 says engineers accept full responsibility for their own work and 1.03 ties approval to safety and testing; the code says nothing about who else shares responsibility, so that part stays an assumption. | qualify |
 
 ### Change log
 
-<!-- At least two substantive revisions. Your final version must differ from the AI wording,
-     and the reason must say which evidence or scenario constraint made you change it. -->
-
+| AI wording / suggestion | Your final version | Reason for change |
+| --- | --- | --- |
 | record nothing by default, use the camera for live navigation, keep footage only after an incident | Keep a short rolling buffer that overwrites itself and is saved only after an incident, with named staff and an audit log. | Without any recording there is no evidence of what happened after a crash over the gorge, while ACM clause 1.03 requires that the system does not diminish privacy, so storage is limited, not removed. |
 | Return on connection loss: a sensible default, but not always the safest. | The loss-of-link action is a configurable setting, so the team chooses it deliberately for each part of the route. | The PX4 page lists several options (hold, return, land and others), and with a 12 km one-way range over a gorge no single default fits every position. |

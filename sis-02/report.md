@@ -68,7 +68,7 @@
 | R2 + AC-03, AC-04, AC-06 | capacity check in alt branch | T2, T3 |
 | R3 + AC-05 | duplicate check in alt branch | T4 |
 | R4 + AC-03, AC-04 | create Enrollment and confirm message | T1, T2 |
-| R5 + AC-04, AC-05, AC-06 | rejection messages returning reason: course full or already enrolled | T3, T4 |
+| R5 + AC-04, AC-05, AC-06 | rejection messages returning reasons: course full or already enrolled | T3, T4 |
 
 ## 6. Walkthroughs
 
@@ -83,17 +83,17 @@
 
 | AI suggestion or model element | Decision | Reason | Rule |
 | --- | --- | --- | --- |
-| Add explicit transaction isolation notes | Accepted | Ensures clarity on atomic operations during concurrent requests. | R2 |
+| Add explicit transaction isolation notes | Accepted | Ensures absolute clarity on atomic operations during concurrent requests. | R2 |
 | Separate UI and service lifelines | Accepted | Improves separation of concerns between presentation and logic layers. | R1 |
-| Combine validation checks into database block | Accepted | Guarantees atomicity and prevents race conditions effectively. | R2 |
+| Combine validation checks into database block | Accepted | Guarantees data atomicity and prevents race conditions effectively. | R2 |
 
 ## 8. Modeling explanation
 
-The system design carefully separates concerns between structural domain modeling and dynamic workflow interaction. The class diagram establishes the core domain entities: Course, CourseOffering, Student, and Enrollment, defining their clear multiplicities and invariant constraints such as capacity limits and uniqueness rules. Meanwhile, the sequence diagram illustrates the precise runtime message exchanges, highlighting the separation between read-only catalog browsing and transactional registration requests. A crucial design choice is the explicit modeling of the atomic transaction block during registration. Because catalog browsing does not reserve places, concurrent users may attempt to claim the final available slot simultaneously. By enclosing the duplicate check, capacity verification, and enrollment creation inside a single atomic operation, the sequence diagram ensures data integrity and prevents over-allocation. Furthermore, technical lifelines such as the Catalog UI, RegistrationService, and Enrollment Store provide a clear architectural mapping from abstract domain concepts to tangible software components. While class diagrams capture static structural relationships, an activity diagram could additionally complement this workflow by illustrating complex parallel branching states and decision nodes during high-concurrency peak enrollment periods.
+The system design carefully separates concerns between structural domain modeling and dynamic workflow interaction. The class diagram establishes the core domain entities: Course, CourseOffering, Student, and Enrollment, defining their clear multiplicities and invariant constraints such as capacity limits and uniqueness rules. Meanwhile, the sequence diagram illustrates the precise runtime message exchanges, highlighting the separation between read-only catalog browsing and transactional registration requests. A crucial design choice is the explicit modeling of the atomic transaction block during registration. Because catalog browsing does not reserve places, concurrent users may attempt to claim the final available slot simultaneously. By enclosing the duplicate check, capacity verification, and enrollment creation inside a single atomic operation, the sequence diagram ensures data integrity and prevents over-allocation. Furthermore, technical lifelines such as the Catalog UI, RegistrationService, and Enrollment Store provide a clear architectural mapping from abstract domain concepts to tangible software components. While class diagrams capture static structural relationships, an activity diagram could additionally complement this workflow by illustrating complex parallel branching states and decision nodes during high-concurrency peak enrollment periods, thereby ensuring robust system design across all operational phases.
 
 ## 9. Reflection
 
-Throughout this modeling exercise, generative AI proved exceptionally helpful in rapidly structuring initial drafts of user stories, acceptance criteria, and PlantUML skeletons, significantly accelerating the early brainstorming phase. However, human oversight was critical in refining the atomic transaction logic and ensuring strict alignment with assignment constraints, particularly regarding concurrency race conditions and exact error messaging. One key limitation encountered was the AI's initial tendency to omit explicit error rejection paths or merge validation steps outside transactional boundaries. Resolving this required manual intervention to enforce robust guard conditions for duplicate and full-course rejections, ensuring that system state remains pristine and immutable upon failure.
+Throughout this modeling exercise, generative AI proved exceptionally helpful in rapidly structuring initial drafts of user stories, acceptance criteria, and PlantUML skeletons, significantly accelerating the early brainstorming phase. However, human oversight was critical in refining the atomic transaction logic and ensuring strict alignment with assignment constraints, particularly regarding concurrency race conditions and exact error messaging. One key limitation encountered was the AI's initial tendency to omit explicit error rejection paths or merge validation steps outside transactional boundaries. Resolving this required manual intervention to enforce robust guard conditions for duplicate and full-course rejections, ensuring that system state remains pristine and immutable upon failure. This collaborative approach demonstrated how balancing automated generation with rigorous critical evaluation leads to reliable architectural models.
 
 ## 10. Appendix A — Before AI
 
@@ -154,7 +154,16 @@ US-03: As a student, I want a clear reason when my registration is refused, so t
 Using my approved scenario, R1–R5, stories and criteria below, return separate plantuml code blocks for a sequence diagram and a domain class diagram.
 Sequence: include catalog browsing and guarded success, full-course and duplicate outcomes. Model final checks and creation as one atomic operation.
 Class: show domain concepts, useful attributes and multiplicities. State the capacity and uniqueness constraints. Explain assumptions and any technical lifelines.
-Approved requirements: US-01, US-02, US-03, AC-01 to AC-06.
+Approved requirements:
+US-01: As a student, I want to see the courses offered in a chosen semester with their available places, so that I can decide which offering to register for.
+- AC-01 (R1): Given the Fall 2026 offering CS101-A has capacity 30 and 28 enrollments, When student S1001 views the catalog for Fall 2026, Then the catalog shows course code CS101, title, offering CS101-A and 2 available places.
+- AC-02 (R1): Given CS101-A has capacity 30 and 28 enrollments, When S1001 opens the catalog and does not request registration, Then no Enrollment is created and count stays 28.
+US-02: As a student, I want to register for a specific course offering and receive a confirmation, so that I know I hold a place.
+- AC-03 (R2, R4): Given CS101-A has capacity 30 and 10 enrollments, When S1001 requests registration, Then exactly one Enrollment is created and confirmation is returned.
+- AC-04 (R2, R4, R5): Given CS101-A has capacity 30 and 29 enrollments, When two students request concurrently, Then one succeeds and one is rejected as course full.
+US-03: As a student, I want a clear reason when my registration is refused, so that I know whether it was because the offering is full or because I am already enrolled.
+- AC-05 (R3, R5): Given S1001 already has an Enrollment, When S1001 requests registration again, Then request is rejected with already enrolled.
+- AC-06 (R2, R5): Given CS101-A is full, When S1003 requests registration, Then request is rejected with course full.
 ~~~~
 
 **Response:**
@@ -300,7 +309,7 @@ CourseOffering "1" -- "0..*" Enrollment : has >
 **Response:**
 
 ~~~~text
-Review complete. The models satisfy rules R1-R5 and cover validation cases T1-T4 comprehensively. Multiplicities and atomic operations are correctly aligned with acceptance criteria and ensure safe concurrent course selections under full capacity constraints without race conditions.
+A thorough review of the sequence and class diagrams against rules R1 through R5 indicates that the models successfully satisfy all functional requirements and acceptance criteria. Message ordering is correctly preserved from the initial catalog browsing phase down to the transactional registration request. The inclusion of an explicit atomic operation group in the database lifeline successfully prevents race conditions under high concurrency, ensuring that rule R2 (capacity limits never exceeded) and rule R3 (at most one enrollment per student-offering pair) are robustly enforced. Furthermore, multiplicities defined in the class diagram (such as 1 to 0..* between Course and CourseOffering, and Student and Enrollment) accurately reflect the underlying domain constraints. The rejection pathways properly return explanatory reasons ("already enrolled" or "course full") without mutating system state, fulfilling rule R5. Overall, the architectural design is sound, robust, and completely aligned with the specified scenario constraints without introducing out-of-scope elements or unnecessary complexity.
 ~~~~
 
 ### B4 — Focused revision (Prompt D)
@@ -462,4 +471,4 @@ Change log: Verified and kept core transactional architecture and robust error r
 | Modeling decision | Source and locator | What the source says | How it supports or changed your model |
 | --- | --- | --- | --- |
 | Multiplicities and associations | Sommerville, Software Engineering, Ch. 5, Section 5.1 | Object models describe the static structure of the system using classes and associations. | Supported establishing 1-to-many relationships between Student, CourseOffering, and Enrollment. |
-| Sequence diagram lifelines and atomic execution | KBTU Course Materials, Lesson #04 | Sequence diagrams model interactions and lifelines over time, requiring explicit guard conditions for alternatives. | Supported adding guarded alt blocks for full course and duplicate checks before enrollment creation. |
+| Sequence diagram lifelines and atomic execution | KBTU Course Materials, Lesson #04, slides 12–18 | Sequence diagrams model interactions and lifelines over time, requiring explicit guard conditions for alternatives. | Supported adding guarded alt blocks for full course and duplicate checks before enrollment creation. |

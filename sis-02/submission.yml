@@ -12,10 +12,10 @@ assistant:
   model: "Sonnet 3.5"
 
 checker:
-  pass: 44
-  fail: 0
+  pass: 38
+  fail: 6
   error: 0
-  commit: ""                      # сюда вставим хеш после коммита
+  commit: "39a0606"                      
 
 counts:
   stories: 3

@@ -1,0 +1,39 @@
+@startuml
+title Course registration: catalog browsing and registration request
+autonumber
+actor "Student S1001" as S
+participant "Catalog UI" as UI
+participant "RegistrationService" as SVC
+database "Enrollment Store" as DB
+S -> UI : openCatalog("Fall 2026")
+UI -> SVC : getCatalog("Fall 2026")
+SVC -> DB : readOfferings(semester = "Fall 2026")
+DB --> SVC : offerings with capacity and enrollment count
+SVC --> UI : rows (courseCode, title, offeringId, availablePlaces)
+UI --> S : CS101 | Introduction to Programming | CS101-A | 2 places
+S -> UI : select CS101-A and request registration
+UI -> SVC : register(studentId = S1001, offeringId = CS101-A)
+SVC -> DB : registerAtomically(S1001, CS101-A)
+activate DB
+group ATOMIC OPERATION: final checks and creation in one transaction
+  alt Enrollment already exists (R3)
+    DB -> DB : outcome = ALREADY_ENROLLED
+  else current enrollment count >= capacity (R2)
+    DB -> DB : outcome = COURSE_FULL
+  else free place and no existing Enrollment
+    DB -> DB : create exactly one Enrollment(S1001, CS101-A)
+  end
+end
+DB --> SVC : outcome
+deactivate DB
+alt outcome = REGISTERED (R4)
+  SVC --> UI : confirmation
+  UI --> S : confirmation
+else outcome = ALREADY_ENROLLED (R3, R5)
+  SVC --> UI : rejection "already enrolled"
+  UI --> S : "already enrolled" reason
+else outcome = COURSE_FULL (R2, R5)
+  SVC --> UI : rejection "course full"
+  UI --> S : "course full" reason
+end
+@enduml

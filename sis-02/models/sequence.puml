@@ -1,0 +1,58 @@
+@startuml
+title Course registration: catalog browsing and registration request
+autonumber
+
+actor "Student S1001" as S
+participant "Catalog UI\n<<technical>>" as UI
+participant "RegistrationService\n<<technical>>" as SVC
+database "Enrollment Store\n<<technical>>" as DB
+
+== Browse catalog (US-01: AC-01, AC-02 / R1) ==
+S -> UI : openCatalog("Fall 2026")
+UI -> SVC : getCatalog("Fall 2026")
+SVC -> DB : readOfferings(semester = "Fall 2026")
+DB --> SVC : offerings with capacity and enrollment count
+SVC --> UI : rows (courseCode, title, offeringId, availablePlaces)
+note right of SVC
+  availablePlaces = capacity - enrollment count
+  Read-only: no Enrollment is created and
+  no place is reserved (AC-02).
+end note
+UI --> S : CS101 | Introduction to Programming | CS101-A | 2 places
+
+== Request registration (US-02, US-03) ==
+S -> UI : select CS101-A and request registration
+UI -> SVC : register(studentId = S1001, offeringId = CS101-A)
+SVC -> DB : registerAtomically(S1001, CS101-A)
+activate DB
+
+group ATOMIC OPERATION: final checks and creation in one transaction
+  alt Enrollment (S1001, CS101-A) already exists (R3)
+    DB -> DB : outcome = ALREADY_ENROLLED\n(nothing written)
+  else current enrollment count >= capacity (R2)
+    DB -> DB : outcome = COURSE_FULL\n(nothing written)
+  else free place and no existing Enrollment
+    DB -> DB : create exactly one Enrollment(S1001, CS101-A)\noutcome = REGISTERED (R4)
+  end
+end
+DB --> SVC : outcome
+deactivate DB
+
+note over DB
+  Concurrent requests for the same offering are serialized (AC-04).
+  With 29 of 30 places taken, S1001 and S1002 both send a request:
+  the first gets REGISTERED (count 30), the second is checked
+  against 30 of 30 and gets COURSE_FULL. The count never reaches 31.
+end note
+
+alt outcome = REGISTERED (AC-03, R4)
+  SVC --> UI : confirmation
+  UI --> S : confirmation, availablePlaces updated
+else outcome = ALREADY_ENROLLED (AC-05, R3, R5)
+  SVC --> UI : rejection "already enrolled"
+  UI --> S : "already enrolled" (enrollment count unchanged)
+else outcome = COURSE_FULL (AC-04, AC-06, R2, R5)
+  SVC --> UI : rejection "course full"
+  UI --> S : "course full" (enrollment count unchanged)
+end
+@enduml

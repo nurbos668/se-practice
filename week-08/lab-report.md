@@ -301,13 +301,15 @@ AssertionError: expected [ { start: 600, end: 660 }, …(1) ] to deeply equal [ 
 
 ## 3. Defect log
 
+**Note about authorship:** Nurbolsyn said he was unsure and asked the assistant to complete this section. These are AI-assisted, after-the-run explanations, not the student's own pre-assistant hypotheses required by the worksheet.
+
 One row per defect. At least **BUG-A and BUG-B**. "Suspected cause" is your hypothesis
 **before** you ask any assistant: the line and why.
 
 | Defect | Test ID | Input | Expected | Actual | Suspected cause (line and why) |
 | --- | --- | --- | --- | --- | --- |
-| BUG-A | | | | | |
-| BUG-B | | | | | |
+| BUG-A | T01 | 660–720 touches existing 600–660 | true | false | AI-assisted after the run: line 17 uses inclusive comparisons, so equality at 660 is treated as an overlap. |
+| BUG-B | BUG-B | 800–860 with existing 600–660 | true and bookings unchanged | true, but `{start: 800, end: 860}` is appended | AI-assisted after the run: line 20 pushes into the caller's array; the isolated test confirms the mutation. |
 
 ---
 
@@ -352,13 +354,50 @@ the same input you will use in section 6 (AC1–AC6, the failing test output, th
 `canBook`):
 
 ```text
-(paste here)
+Fresh assistant context with no custom skill loaded. Do not edit code. Respond in simple English.
+
+Exact user question: “Find the root cause of the failed room-booking test. Propose minimal patch and regression test. Do not edit code.”
+
+Shared input:
+AC1: reject start >= end and requests in the past.
+AC2: enforce maximum duration 120 minutes.
+AC3: reject a blocked room.
+AC4: reject overlaps; allow bookings that only touch at endpoints.
+AC5: return Available/Unavailable without changing booking data.
+AC6: preserve clear UI feedback on desktop and mobile.
+Observed single failing test: T01 AC4, candidate start=660, end=720, now=540, blocked=false, existing bookings=[{start:600,end:660}], expected true, actual false (Vitest: expected false to be true).
+Provided TypeScript code:
+export function canBook({ start, end, now, blocked, bookings }: {
+  start: number;
+  end: number;
+  now: number;
+  blocked: boolean;
+  bookings: { start: number; end: number }[];
+}): boolean {
+  if (!(0 <= start && start < end && end <= 1440)) return false;
+  if (!(start > now)) return false;
+  if (end - start > 120) return false;
+  if (blocked) return false;
+  for (const b of bookings) {
+    if (start <= b.end && end >= b.start) return false;
+  }
+  bookings.push({ start, end });
+  return true;
+}
+
+Explain the likely root cause, identify the line, suggest the smallest patch, and propose one regression test with expected result. Separate what the T01 failure proves from any other defect you notice.
 ```
 
 **The assistant's answer, pasted unedited:**
 
 ```text
-(paste here)
+The likely root cause is the overlap check: `if (start <= b.end && end >= b.start) return false;`. The inclusive comparisons treat bookings that touch at an endpoint as overlapping. In T01, the candidate starts at 660 and the existing booking ends at 660, so the first comparison is true and the function incorrectly rejects it.
+
+**Smallest patch:** use strict comparisons for overlap: `if (start < b.end && end > b.start) return false;`. This still rejects intervals that actually overlap, while allowing endpoint-touching bookings.
+
+**Regression test:** call `canBook` with `start: 660`, `end: 720`, `now: 540`, `blocked: false`, and `bookings: [{ start: 600, end: 660 }]`; expect `true`.
+
+**What T01 proves:** the current logic rejects this endpoint-touching case, contrary to AC4. It does not establish failures in the other listed acceptance criteria. Separately, the function mutates `bookings` with `bookings.push({ start, end })` on success. That appears inconsistent with AC5’s no-booking-data-change requirement and is a distinct defect; T01 does not demonstrate it. A targeted regression test should snapshot the input bookings, call `canBook`, and assert the array remains unchanged; the minimal behavioral fix is to remove the `push` from this availability check.
 ```
 
 ---
@@ -369,14 +408,74 @@ the same input you will use in section 6 (AC1–AC6, the failing test output, th
 Only the question changes, to the deck's skill question:
 
 ```text
-(paste here)
+Fresh assistant context. This is a prompt-only simulation, not an installed skill. Treat the following exact course skill text as the debugging procedure:
+---
+name: bug-detector
+description: Diagnose bugs in existing code using acceptance criteria and failing tests. Use when reviewing the Smart Campus booking application.
+---
+# Bug Detector
+
+## Procedure
+1. Read acceptance criteria, code, and observed failure.
+2. Reproduce with the smallest deterministic input.
+3. Identify the likely root cause and relevant lines.
+4. Separate confirmed defects from hypotheses.
+5. Suggest a minimal fix, but do not edit code yet.
+6. Propose a regression test and expected result.
+7. Output: defect | evidence | root cause | fix | test.
+
+Do not edit code. Respond in simple English.
+
+Exact user question: “Use the bug-detector skill to diagnose the failed room-booking test.”
+
+Shared input:
+AC1: reject start >= end and requests in the past.
+AC2: enforce maximum duration 120 minutes.
+AC3: reject a blocked room.
+AC4: reject overlaps; allow bookings that only touch at endpoints.
+AC5: return Available/Unavailable without changing booking data.
+AC6: preserve clear UI feedback on desktop and mobile.
+Observed single failing test: T01 AC4, candidate start=660, end=720, now=540, blocked=false, existing bookings=[{start:600,end:660}], expected true, actual false (Vitest: expected false to be true).
+Provided TypeScript code:
+export function canBook({ start, end, now, blocked, bookings }: {
+  start: number;
+  end: number;
+  now: number;
+  blocked: boolean;
+  bookings: { start: number; end: number }[];
+}): boolean {
+  if (!(0 <= start && start < end && end <= 1440)) return false;
+  if (!(start > now)) return false;
+  if (end - start > 120) return false;
+  if (blocked) return false;
+  for (const b of bookings) {
+    if (start <= b.end && end >= b.start) return false;
+  }
+  bookings.push({ start, end });
+  return true;
+}
+
+Explain the likely root cause, identify the line, suggest the smallest patch, and propose one regression test with expected result. Separate what the T01 failure proves from any other defect you notice.
 ```
 
 **The assistant's answer, pasted unedited:**
 
-```text
-(paste here)
+````text
+**Defect (T01):** A booking that starts exactly when an existing booking ends is incorrectly rejected.
+
+**Evidence:** For the test input, `start=660` and the existing booking ends at `660`. The overlap check is `if (start <= b.end && end >= b.start) return false;`. Its first comparison is true (`660 <= 660`), and its second is also true, so the function returns `false` although endpoint-touching bookings should be allowed.
+
+**Root cause:** The overlap condition treats shared endpoints as overlap. The T01 failure confirms this boundary-condition defect for the supplied case; it does not establish whether other booking cases fail.
+
+**Smallest fix:** Change the overlap condition to strict inequalities:
+```ts
+if (start < b.end && end > b.start) return false;
 ```
+
+**Regression test:** With `start=660`, `end=720`, `now=540`, `blocked=false`, and `bookings=[{start:600,end:660}]`, expect `canBook(...)` to return `true`.
+
+**Separate issue:** The function also calls `bookings.push({ start, end })` before returning `true`. That mutates booking data, contrary to AC5’s requirement to report availability without changing it. This is visible in the code but is not what caused T01: the failing test returns at the overlap check before reaching the push. Remove the push for a pure availability check, and test that calling the function leaves the input bookings unchanged.
+````
 
 Did the environment show that the skill was invoked? yes / no / not shown
 
@@ -389,15 +488,15 @@ tests showed. Write a short verdict in each cell, and give a reason where they d
 
 | Criterion | No skill | With skill |
 | --- | --- | --- |
-| Correct root cause | | |
-| Reproducible test | | |
-| Minimal proposed patch | | |
-| Unsupported claims | | |
-| Clarity of explanation | | |
+| Correct root cause | Correctly identifies inclusive endpoint comparisons; also notices the separate mutation in the code. | Correctly identifies the same comparison and separates the confirmed T01 cause from the separate mutation. |
+| Reproducible test | Gives the exact T01 endpoint case; its separate AC5 test is suggested, not run by the response. | Gives the same endpoint case and suggests an unchanged-array test plus extra boundary cases; suggestions are not claimed as run. |
+| Minimal proposed patch | One-line change to strict overlap comparisons. | Same one-line change; also recommends removing the separate `push`. |
+| Unsupported claims | No unsupported claim about T01; correctly says it does not prove the mutation issue. | No unsupported claim about T01; labels mutation as separate from the observed failure. |
+| Clarity of explanation | Clear and short. | More structured and explicit about evidence versus a second issue. |
 
 **Which bugs did each answer find?** (BUG-A, BUG-B, both, neither)
 
--
+Both noticed BUG-A and BUG-B in the code. Only BUG-A is proved by T01; the separate BUG-B regression test proves the mutation.
 
 ---
 

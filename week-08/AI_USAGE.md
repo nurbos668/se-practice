@@ -14,7 +14,7 @@ Required by the course academic policy (Generative AI use level **D — AI-integ
 
 **I used another assistant as well (to explain a failure, to draft text in lab-report.md, …):** yes — separate fresh Manus assistant contexts were used for §5 and §6. No other assistant provider was used; exact model names were not displayed.
 
-**Every terminal output in lab-report.md was pasted from a real run, unedited:** yes. The Vitest and build logs are real and unedited. The official checker on `week-08` returned 30 PASS, 0 FAIL and 1 ERROR (`E1`); that result will be recorded in `submission.yml`. The validator will be run before push.
+**Every terminal output in lab-report.md was pasted from a real run, unedited:** yes. The Vitest and build logs are real and unedited. The official checker returned 30 PASS, 0 FAIL and 1 ERROR (`E1`), recorded in `submission.yml`. The submission validator passed 15/15 checks.
 
 **I can explain both bugs and both fixes — which line, why it was wrong, which test proves the
 fix — without the assistant:** no — the student has not confirmed this.

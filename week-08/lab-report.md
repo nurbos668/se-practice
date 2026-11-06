@@ -510,7 +510,135 @@ Rerun the test that was failing, then the full suite.
 The change as a diff (`git diff`, or the old and the new line), then the real run:
 
 ```text
-(paste here)
+$ git diff -- week-08/app/src/booking.ts
+[1mdiff --git a/week-08/app/src/booking.ts b/week-08/app/src/booking.ts[m
+[1mindex 83fc391..db3c8cc 100644[m
+[1m--- a/week-08/app/src/booking.ts[m
+[1m+++ b/week-08/app/src/booking.ts[m
+[36m@@ -20,7 +20,7 @@[m [mexport function canBook({ start, end, now, blocked, bookings }: {[m
+   if (end - start > 120) return false;[m
+   if (blocked) return false;[m
+   for (const b of bookings) {[m
+[31m-    if (start <= b.end && end >= b.start) return false;[m
+[32m+[m[32m    if (start < b.end && end > b.start) return false;[m
+   }[m
+   // keep the room's list current with the slot that was just found free[m
+   bookings.push({ start, end });[m
+
+$ npx vitest run -t BUG-A --reporter=verbose
+RUN  v3.2.4 /home/ubuntu/work/se-practice-github/week-08/app
+
+ ↓ src/booking.test.ts > T01 AC4: a request touching the booking after it is available
+ ↓ src/booking.test.ts > T02 AC1: a request starting at the current time is unavailable
+ ↓ src/booking.test.ts > T03 AC1: a zero-length interval is unavailable
+ ↓ src/booking.test.ts > T04 AC1: a reversed interval is unavailable
+ ↓ src/booking.test.ts > T05 AC1: an interval ending after midnight is unavailable
+ ↓ src/booking.test.ts > T06 AC2: exactly 120 minutes is available
+ ↓ src/booking.test.ts > T07 AC2: a 121-minute booking is unavailable
+ ↓ src/booking.test.ts > T08 AC4: a request touching the booking before it is available
+ ↓ src/booking.test.ts > T09 AC4: a partial overlap is unavailable
+ ↓ src/booking.test.ts > T10 AC4: a request containing an existing booking is unavailable
+ ↓ src/booking.test.ts > T11 AC4: a request inside an existing booking is unavailable
+ ↓ src/booking.test.ts > T12 AC4: an identical interval is unavailable
+ ↓ src/booking.test.ts > T13 AC3: a blocked room is unavailable
+ ↓ src/booking.test.ts > T14 AC4: a request with no existing bookings is available
+ ↓ src/booking.test.ts > AC5: an available request leaves the booking data unchanged
+ ↓ src/booking.test.ts > X1 AC1: a valid interval may end exactly at 1440
+ ↓ src/booking.test.ts > X2 AC4: a request overlapping the second of two bookings is unavailable
+ ✓ src/booking.test.ts > BUG-A: a request touching two adjacent bookings is available 2ms
+ ↓ src/booking.test.ts > BUG-B: an available request leaves the booking data unchanged
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 18 skipped (19)
+   Start at  09:27:14
+   Duration  328ms (transform 44ms, setup 0ms, collect 41ms, tests 4ms, environment 0ms, prepare 84ms)
+
+$ npx vitest run --reporter=verbose (after BUG-A only)
+RUN  v3.2.4 /home/ubuntu/work/se-practice-github/week-08/app
+
+ ✓ src/booking.test.ts > T01 AC4: a request touching the booking after it is available 1ms
+ ✓ src/booking.test.ts > T02 AC1: a request starting at the current time is unavailable 0ms
+ ✓ src/booking.test.ts > T03 AC1: a zero-length interval is unavailable 0ms
+ ✓ src/booking.test.ts > T04 AC1: a reversed interval is unavailable 0ms
+ ✓ src/booking.test.ts > T05 AC1: an interval ending after midnight is unavailable 0ms
+ ✓ src/booking.test.ts > T06 AC2: exactly 120 minutes is available 0ms
+ ✓ src/booking.test.ts > T07 AC2: a 121-minute booking is unavailable 0ms
+ ✓ src/booking.test.ts > T08 AC4: a request touching the booking before it is available 0ms
+ ✓ src/booking.test.ts > T09 AC4: a partial overlap is unavailable 0ms
+ ✓ src/booking.test.ts > T10 AC4: a request containing an existing booking is unavailable 0ms
+ ✓ src/booking.test.ts > T11 AC4: a request inside an existing booking is unavailable 0ms
+ ✓ src/booking.test.ts > T12 AC4: an identical interval is unavailable 0ms
+ ✓ src/booking.test.ts > T13 AC3: a blocked room is unavailable 0ms
+ ✓ src/booking.test.ts > T14 AC4: a request with no existing bookings is available 0ms
+ × src/booking.test.ts > AC5: an available request leaves the booking data unchanged 8ms
+   → expected [ { start: 600, end: 660 }, …(1) ] to deeply equal [ { start: 600, end: 660 } ]
+ ✓ src/booking.test.ts > X1 AC1: a valid interval may end exactly at 1440 0ms
+ ✓ src/booking.test.ts > X2 AC4: a request overlapping the second of two bookings is unavailable 0ms
+ ✓ src/booking.test.ts > BUG-A: a request touching two adjacent bookings is available 0ms
+ × src/booking.test.ts > BUG-B: an available request leaves the booking data unchanged 1ms
+   → expected [ { start: 600, end: 660 }, …(1) ] to deeply equal [ { start: 600, end: 660 } ]
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 2 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.ts > AC5: an available request leaves the booking data unchanged
+AssertionError: expected [ { start: 600, end: 660 }, …(1) ] to deeply equal [ { start: 600, end: 660 } ]
+
+- Expected
++ Received
+
+  [
+    {
+      "end": 660,
+      "start": 600,
+    },
++   {
++     "end": 720,
++     "start": 660,
++   },
+  ]
+
+ ❯ src/booking.test.ts:77:20
+     75| 
+     76|   expect(available).toBe(true);
+     77|   expect(bookings).toEqual(before);
+       |                    ^
+     78| });
+     79| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/2]⎯
+
+ FAIL  src/booking.test.ts > BUG-B: an available request leaves the booking data unchanged
+AssertionError: expected [ { start: 600, end: 660 }, …(1) ] to deeply equal [ { start: 600, end: 660 } ]
+
+- Expected
++ Received
+
+  [
+    {
+      "end": 660,
+      "start": 600,
+    },
++   {
++     "end": 860,
++     "start": 800,
++   },
+  ]
+
+ ❯ src/booking.test.ts:105:20
+    103| 
+    104|   expect(available).toBe(true);
+    105|   expect(bookings).toEqual(before);
+       |                    ^
+    106| });
+    107| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/2]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  2 failed | 17 passed (19)
+   Start at  09:27:15
+   Duration  318ms (transform 41ms, setup 0ms, collect 36ms, tests 14ms, environment 0ms, prepare 55ms)
 ```
 
 ### 8.2 The BUG-B patch and the final run

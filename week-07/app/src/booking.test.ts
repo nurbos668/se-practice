@@ -32,8 +32,8 @@ test('T05 AC1: an interval ending after midnight is unavailable', () => {
   expect(decide(1380, 1441)).toBe(false);
 });
 
-test('T06 AC2: a 120-minute booking is unavailable', () => {
-  expect(decide(720, 840)).toBe(false);
+test('T06 AC2: exactly 120 minutes is available', () => {
+  expect(decide(720, 840)).toBe(true);
 });
 
 test('T07 AC2: a 121-minute booking is unavailable', () => {
@@ -75,4 +75,12 @@ test('AC5: an available request leaves the booking data unchanged', () => {
 
   expect(available).toBe(true);
   expect(bookings).toEqual(before);
+});
+
+test('X1 AC1: a valid interval may end exactly at 1440', () => {
+  expect(decide(1380, 1440, { now: 1379, bookings: [] })).toBe(true);
+});
+
+test('X2 AC4: a request overlapping the second of two bookings is unavailable', () => {
+  expect(decide(780, 840, { bookings: [{ start: 600, end: 660 }, { start: 810, end: 870 }] })).toBe(false);
 });

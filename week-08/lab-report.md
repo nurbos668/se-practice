@@ -158,7 +158,143 @@ Run them **on the buggy code**. Both must fail here. That is the evidence that e
 its bug.
 
 ```text
-(paste here)
+RUN  v3.2.4 /home/ubuntu/work/se-practice-github/week-08/app
+
+ × src/booking.test.ts > T01 AC4: a request touching the booking after it is available 7ms
+   → expected false to be true // Object.is equality
+ ✓ src/booking.test.ts > T02 AC1: a request starting at the current time is unavailable 0ms
+ ✓ src/booking.test.ts > T03 AC1: a zero-length interval is unavailable 0ms
+ ✓ src/booking.test.ts > T04 AC1: a reversed interval is unavailable 0ms
+ ✓ src/booking.test.ts > T05 AC1: an interval ending after midnight is unavailable 0ms
+ ✓ src/booking.test.ts > T06 AC2: exactly 120 minutes is available 0ms
+ ✓ src/booking.test.ts > T07 AC2: a 121-minute booking is unavailable 0ms
+ × src/booking.test.ts > T08 AC4: a request touching the booking before it is available 1ms
+   → expected false to be true // Object.is equality
+ ✓ src/booking.test.ts > T09 AC4: a partial overlap is unavailable 0ms
+ ✓ src/booking.test.ts > T10 AC4: a request containing an existing booking is unavailable 0ms
+ ✓ src/booking.test.ts > T11 AC4: a request inside an existing booking is unavailable 0ms
+ ✓ src/booking.test.ts > T12 AC4: an identical interval is unavailable 0ms
+ ✓ src/booking.test.ts > T13 AC3: a blocked room is unavailable 0ms
+ ✓ src/booking.test.ts > T14 AC4: a request with no existing bookings is available 0ms
+ × src/booking.test.ts > AC5: an available request leaves the booking data unchanged 1ms
+   → expected false to be true // Object.is equality
+ ✓ src/booking.test.ts > X1 AC1: a valid interval may end exactly at 1440 0ms
+ ✓ src/booking.test.ts > X2 AC4: a request overlapping the second of two bookings is unavailable 0ms
+ × src/booking.test.ts > BUG-A: a request touching two adjacent bookings is available 0ms
+   → expected false to be true // Object.is equality
+ × src/booking.test.ts > BUG-B: an available request leaves the booking data unchanged 3ms
+   → expected [ { start: 600, end: 660 }, …(1) ] to deeply equal [ { start: 600, end: 660 } ]
+
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 5 ⎯⎯⎯⎯⎯⎯⎯
+
+ FAIL  src/booking.test.ts > T01 AC4: a request touching the booking after it is available
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:16:28
+     14| 
+     15| test('T01 AC4: a request touching the booking after it is available', …
+     16|   expect(decide(660, 720)).toBe(true);
+       |                            ^
+     17| });
+     18| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/5]⎯
+
+ FAIL  src/booking.test.ts > T08 AC4: a request touching the booking before it is available
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:44:28
+     42| 
+     43| test('T08 AC4: a request touching the booking before it is available',…
+     44|   expect(decide(570, 600)).toBe(true);
+       |                            ^
+     45| });
+     46| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/5]⎯
+
+ FAIL  src/booking.test.ts > AC5: an available request leaves the booking data unchanged
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:76:21
+     74|   const available = canBook({ start: 660, end: 720, now: 540, blocked:…
+     75| 
+     76|   expect(available).toBe(true);
+       |                     ^
+     77|   expect(bookings).toEqual(before);
+     78| });
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/5]⎯
+
+ FAIL  src/booking.test.ts > BUG-A: a request touching two adjacent bookings is available
+AssertionError: expected false to be true // Object.is equality
+
+- Expected
++ Received
+
+- true
++ false
+
+ ❯ src/booking.test.ts:96:21
+     94|   const available = canBook({ start: 660, end: 720, now: 540, blocked:…
+     95| 
+     96|   expect(available).toBe(true);
+       |                     ^
+     97| });
+     98| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/5]⎯
+
+ FAIL  src/booking.test.ts > BUG-B: an available request leaves the booking data unchanged
+AssertionError: expected [ { start: 600, end: 660 }, …(1) ] to deeply equal [ { start: 600, end: 660 } ]
+
+- Expected
++ Received
+
+  [
+    {
+      "end": 660,
+      "start": 600,
+    },
++   {
++     "end": 860,
++     "start": 800,
++   },
+  ]
+
+ ❯ src/booking.test.ts:105:20
+    103| 
+    104|   expect(available).toBe(true);
+    105|   expect(bookings).toEqual(before);
+       |                    ^
+    106| });
+    107| 
+
+⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/5]⎯
+
+
+ Test Files  1 failed (1)
+      Tests  5 failed | 14 passed (19)
+   Start at  09:23:56
+   Duration  327ms (transform 40ms, setup 0ms, collect 35ms, tests 15ms, environment 0ms, prepare 54ms)
 ```
 
 ---

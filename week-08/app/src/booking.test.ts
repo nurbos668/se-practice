@@ -84,3 +84,23 @@ test('X1 AC1: a valid interval may end exactly at 1440', () => {
 test('X2 AC4: a request overlapping the second of two bookings is unavailable', () => {
   expect(decide(780, 840, { bookings: [{ start: 600, end: 660 }, { start: 810, end: 870 }] })).toBe(false);
 });
+
+
+test('BUG-A: a request touching two adjacent bookings is available', () => {
+  const bookings = [
+    { start: 600, end: 660 },
+    { start: 720, end: 780 },
+  ];
+  const available = canBook({ start: 660, end: 720, now: 540, blocked: false, bookings });
+
+  expect(available).toBe(true);
+});
+
+test('BUG-B: an available request leaves the booking data unchanged', () => {
+  const bookings = [{ start: 600, end: 660 }];
+  const before = structuredClone(bookings);
+  const available = canBook({ start: 800, end: 860, now: 540, blocked: false, bookings });
+
+  expect(available).toBe(true);
+  expect(bookings).toEqual(before);
+});

@@ -646,7 +646,89 @@ AssertionError: expected [ { start: 600, end: 660 }, …(1) ] to deeply equal [ 
 The change as a diff, then the real output of the **full** suite. Every test must pass.
 
 ```text
-(paste here)
+$ git diff -- week-08/app/src/booking.ts
+[1mdiff --git a/week-08/app/src/booking.ts b/week-08/app/src/booking.ts[m
+[1mindex db3c8cc..0f83758 100644[m
+[1m--- a/week-08/app/src/booking.ts[m
+[1m+++ b/week-08/app/src/booking.ts[m
+[36m@@ -22,7 +22,5 @@[m [mexport function canBook({ start, end, now, blocked, bookings }: {[m
+   for (const b of bookings) {[m
+     if (start < b.end && end > b.start) return false;[m
+   }[m
+[31m-  // keep the room's list current with the slot that was just found free[m
+[31m-  bookings.push({ start, end });[m
+   return true;[m
+ }[m
+
+$ npx vitest run -t BUG-B --reporter=verbose
+RUN  v3.2.4 /home/ubuntu/work/se-practice-github/week-08/app
+
+ ↓ src/booking.test.ts > T01 AC4: a request touching the booking after it is available
+ ↓ src/booking.test.ts > T02 AC1: a request starting at the current time is unavailable
+ ↓ src/booking.test.ts > T03 AC1: a zero-length interval is unavailable
+ ↓ src/booking.test.ts > T04 AC1: a reversed interval is unavailable
+ ↓ src/booking.test.ts > T05 AC1: an interval ending after midnight is unavailable
+ ↓ src/booking.test.ts > T06 AC2: exactly 120 minutes is available
+ ↓ src/booking.test.ts > T07 AC2: a 121-minute booking is unavailable
+ ↓ src/booking.test.ts > T08 AC4: a request touching the booking before it is available
+ ↓ src/booking.test.ts > T09 AC4: a partial overlap is unavailable
+ ↓ src/booking.test.ts > T10 AC4: a request containing an existing booking is unavailable
+ ↓ src/booking.test.ts > T11 AC4: a request inside an existing booking is unavailable
+ ↓ src/booking.test.ts > T12 AC4: an identical interval is unavailable
+ ↓ src/booking.test.ts > T13 AC3: a blocked room is unavailable
+ ↓ src/booking.test.ts > T14 AC4: a request with no existing bookings is available
+ ↓ src/booking.test.ts > AC5: an available request leaves the booking data unchanged
+ ↓ src/booking.test.ts > X1 AC1: a valid interval may end exactly at 1440
+ ↓ src/booking.test.ts > X2 AC4: a request overlapping the second of two bookings is unavailable
+ ↓ src/booking.test.ts > BUG-A: a request touching two adjacent bookings is available
+ ✓ src/booking.test.ts > BUG-B: an available request leaves the booking data unchanged 2ms
+
+ Test Files  1 passed (1)
+      Tests  1 passed | 18 skipped (19)
+   Start at  09:27:55
+   Duration  323ms (transform 41ms, setup 0ms, collect 35ms, tests 3ms, environment 0ms, prepare 63ms)
+
+$ npx vitest run --reporter=verbose
+RUN  v3.2.4 /home/ubuntu/work/se-practice-github/week-08/app
+
+ ✓ src/booking.test.ts > T01 AC4: a request touching the booking after it is available 1ms
+ ✓ src/booking.test.ts > T02 AC1: a request starting at the current time is unavailable 0ms
+ ✓ src/booking.test.ts > T03 AC1: a zero-length interval is unavailable 0ms
+ ✓ src/booking.test.ts > T04 AC1: a reversed interval is unavailable 0ms
+ ✓ src/booking.test.ts > T05 AC1: an interval ending after midnight is unavailable 0ms
+ ✓ src/booking.test.ts > T06 AC2: exactly 120 minutes is available 0ms
+ ✓ src/booking.test.ts > T07 AC2: a 121-minute booking is unavailable 0ms
+ ✓ src/booking.test.ts > T08 AC4: a request touching the booking before it is available 0ms
+ ✓ src/booking.test.ts > T09 AC4: a partial overlap is unavailable 0ms
+ ✓ src/booking.test.ts > T10 AC4: a request containing an existing booking is unavailable 0ms
+ ✓ src/booking.test.ts > T11 AC4: a request inside an existing booking is unavailable 0ms
+ ✓ src/booking.test.ts > T12 AC4: an identical interval is unavailable 0ms
+ ✓ src/booking.test.ts > T13 AC3: a blocked room is unavailable 0ms
+ ✓ src/booking.test.ts > T14 AC4: a request with no existing bookings is available 0ms
+ ✓ src/booking.test.ts > AC5: an available request leaves the booking data unchanged 1ms
+ ✓ src/booking.test.ts > X1 AC1: a valid interval may end exactly at 1440 0ms
+ ✓ src/booking.test.ts > X2 AC4: a request overlapping the second of two bookings is unavailable 0ms
+ ✓ src/booking.test.ts > BUG-A: a request touching two adjacent bookings is available 0ms
+ ✓ src/booking.test.ts > BUG-B: an available request leaves the booking data unchanged 0ms
+
+ Test Files  1 passed (1)
+      Tests  19 passed (19)
+   Start at  09:27:57
+   Duration  301ms (transform 41ms, setup 0ms, collect 36ms, tests 5ms, environment 0ms, prepare 59ms)
+
+$ npm run build
+> smart-campus-availability@0.0.0 build
+> tsc && vite build
+
+vite v5.4.21 building for production...
+transforming...
+✓ 32 modules transformed.
+rendering chunks...
+computing gzip size...
+dist/index.html                   0.42 kB │ gzip:  0.28 kB
+dist/assets/index-X8OGNIvT.css    0.66 kB │ gzip:  0.36 kB
+dist/assets/index-D9kEtwvx.js   144.75 kB │ gzip: 46.63 kB
+✓ built in 663ms
 ```
 
 ---

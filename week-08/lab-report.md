@@ -317,16 +317,22 @@ One row per defect. At least **BUG-A and BUG-B**. "Suspected cause" is your hypo
 
 | Check | yes / no |
 | --- | --- |
-| The file is plain UTF-8 text, named exactly `SKILL.md` (not `SKILL.md.txt`) | yes / no |
-| The first and the closing YAML delimiter are exactly three hyphens: `---` | yes / no |
-| `name` is lowercase with hyphens, and `description` says WHEN to use it | yes / no |
-| I read the whole file once: no passwords, API keys or private student data | yes / no |
+| The file is plain UTF-8 text, named exactly `SKILL.md` (not `SKILL.md.txt`) | yes |
+| The first and the closing YAML delimiter are exactly three hyphens: `---` | yes |
+| `name` is lowercase with hyphens, and `description` says WHEN to use it | yes |
+| I read the whole file once: no passwords, API keys or private student data | no — the assistant inspected it; student review is not confirmed |
 
 **The contents of `skills/bug-detector.zip`.** Paste the listing (Windows: open the ZIP and copy
 the paths; macOS/Linux: `unzip -l skills/bug-detector.zip`):
 
 ```text
-(paste here)
+Archive:  bug-detector.zip
+  Length      Date    Time    Name
+---------  ---------- -----   ----
+        0  2026-11-06 09:24   bug-detector/
+      570  2026-11-06 09:24   bug-detector/SKILL.md
+---------                     -------
+      570                     2 files
 ```
 
 **Installation.** Where you uploaded it, what the upload said, and whether a new chat showed the
@@ -334,6 +340,8 @@ skill as enabled. If upload was not available, write `prompt-only simulation` an
 Screenshot of the result: `evidence/install.png`.
 
 <!-- Write below this line -->
+
+The ChatGPT Skills page opened at sign-in, so the ZIP was not installed. The fallback was a prompt-only simulation in a fresh Manus assistant context; the skill text was supplied as instructions, not loaded as an installed skill. The student has not confirmed reading the file. No genuine browser screenshot of the simulation was available, so E1 is reported as a known failure in §9.1 rather than replaced with a fabricated image.
 
 ---
 

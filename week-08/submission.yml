@@ -1,0 +1,46 @@
+schema: 1
+week: "08"
+
+student:
+  name: "Nurbolsyn Tajikossov"
+  student_id: "24B030242"
+  github: "nurbos668"
+
+assistant:
+  tool: "Manus assistant"
+  model: "not displayed"
+
+skill:
+  environment: "prompt-only"
+  invoked: "not-shown"
+
+project:
+  language: "ts"
+  vitest: "3.2.4"
+
+counts:
+  tests_final: 19
+  buggy_failed: 3
+  defects_logged: 2
+  lines_changed: 2
+
+checker:
+  pass: 30
+  fail: 0
+  error: 1
+  commit: "d14f4ff"
+  known_fails: [E1]
+
+verdict:
+  skill_helped: "yes"
+
+review_findings:
+  - "BUG-A: strict overlap comparisons allow endpoint-touching requests while real overlaps remain unavailable."
+  - "BUG-B: the 800-860 regression case touches no booking and catches mutation of the caller's list."
+  - "AC5: the original touching request was rejected before BUG-A was fixed, hiding the separate push mutation."
+
+honesty:
+  buggy_function_pasted_unchanged: "yes"
+  same_input_both_chats: "yes"
+  outputs_unedited: "yes"
+  ai_usage_disclosed: "yes"

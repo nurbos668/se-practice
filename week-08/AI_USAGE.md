@@ -14,9 +14,10 @@ Required by the course academic policy (Generative AI use level **D — AI-integ
 
 **I used another assistant as well (to explain a failure, to draft text in lab-report.md, …):** yes — separate fresh Manus assistant contexts were used for §5 and §6. No other assistant provider was used; exact model names were not displayed.
 
-**Every terminal output in lab-report.md was pasted from a real run, unedited:** yes. The checker and validator runs will be recorded from the terminal before final submission.
+**Every terminal output in lab-report.md was pasted from a real run, unedited:** yes. The Vitest and build logs are real and unedited. The official checker on `week-08` returned 30 PASS, 0 FAIL and 1 ERROR (`E1`); that result will be recorded in `submission.yml`. The validator will be run before push.
 
-**I can explain both bugs and both fixes — which line, why it was wrong, which test proves the fix — without the assistant:** no — the student has not confirmed this.
+**I can explain both bugs and both fixes — which line, why it was wrong, which test proves the
+fix — without the assistant:** no — the student has not confirmed this.
 
 **Anything I accepted from the AI without fully understanding it:** `app/src/booking.ts`: changing the overlap comparison to strict inequalities and removing `bookings.push`; the student asked the assistant to complete the task and has not confirmed independent understanding.
 

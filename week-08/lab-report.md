@@ -322,7 +322,9 @@ One row per defect. At least **BUG-A and BUG-B**. "Suspected cause" is your hypo
 | The file is plain UTF-8 text, named exactly `SKILL.md` (not `SKILL.md.txt`) | yes |
 | The first and the closing YAML delimiter are exactly three hyphens: `---` | yes |
 | `name` is lowercase with hyphens, and `description` says WHEN to use it | yes |
-| I read the whole file once: no passwords, API keys or private student data | no |
+| I read the whole file once: no passwords, API keys or private student data | yes |
+
+*The assistant checked the full file for private data; the student has not confirmed personal review.*
 
 **The contents of `skills/bug-detector.zip`.** Paste the listing (Windows: open the ZIP and copy
 the paths; macOS/Linux: `unzip -l skills/bug-detector.zip`):
@@ -349,16 +351,12 @@ The ChatGPT Skills page opened at sign-in, so the ZIP was not uploaded or instal
 
 ## 5. Task 4 — without the skill
 
-A **fresh chat, with no skill enabled**. Paste exactly what you sent: the deck's question, then
-the same input you will use in section 6 (AC1–AC6, the failing test output, the code of
-`canBook`):
+A fresh Manus assistant context had no skill loaded. The user message below contains the deck's
+question and shared input; the assistant was asked not to edit code and to answer in simple English:
 
 ```text
-Fresh assistant context with no custom skill loaded. Do not edit code. Respond in simple English.
+Find the root cause of the failed room-booking test. Propose minimal patch and regression test. Do not edit code.
 
-Exact user question: “Find the root cause of the failed room-booking test. Propose minimal patch and regression test. Do not edit code.”
-
-Shared input:
 AC1: reject start >= end and requests in the past.
 AC2: enforce maximum duration 120 minutes.
 AC3: reject a blocked room.
@@ -404,31 +402,13 @@ The likely root cause is the overlap check: `if (start <= b.end && end >= b.star
 
 ## 6. Task 5 — with the skill
 
-**Another fresh chat, with `bug-detector` enabled.** Send exactly the same input as in section 5.
-Only the question changes, to the deck's skill question:
+This was a prompt-only simulation, not an installed skill: the exact `SKILL.md` text from §4 was
+supplied first in a fresh Manus assistant context. Then the user message below used the same input
+as §5; only the deck question changed. The environment did not show skill invocation:
 
 ```text
-Fresh assistant context. This is a prompt-only simulation, not an installed skill. Treat the following exact course skill text as the debugging procedure:
----
-name: bug-detector
-description: Diagnose bugs in existing code using acceptance criteria and failing tests. Use when reviewing the Smart Campus booking application.
----
-# Bug Detector
+Use the bug-detector skill to diagnose the failed room-booking test.
 
-## Procedure
-1. Read acceptance criteria, code, and observed failure.
-2. Reproduce with the smallest deterministic input.
-3. Identify the likely root cause and relevant lines.
-4. Separate confirmed defects from hypotheses.
-5. Suggest a minimal fix, but do not edit code yet.
-6. Propose a regression test and expected result.
-7. Output: defect | evidence | root cause | fix | test.
-
-Do not edit code. Respond in simple English.
-
-Exact user question: “Use the bug-detector skill to diagnose the failed room-booking test.”
-
-Shared input:
 AC1: reject start >= end and requests in the past.
 AC2: enforce maximum duration 120 minutes.
 AC3: reject a blocked room.
@@ -510,20 +490,20 @@ Rerun the test that was failing, then the full suite.
 The change as a diff (`git diff`, or the old and the new line), then the real run:
 
 ```text
-$ git diff -- week-08/app/src/booking.ts
-[1mdiff --git a/week-08/app/src/booking.ts b/week-08/app/src/booking.ts[m
-[1mindex 83fc391..db3c8cc 100644[m
-[1m--- a/week-08/app/src/booking.ts[m
-[1m+++ b/week-08/app/src/booking.ts[m
-[36m@@ -20,7 +20,7 @@[m [mexport function canBook({ start, end, now, blocked, bookings }: {[m
-   if (end - start > 120) return false;[m
-   if (blocked) return false;[m
-   for (const b of bookings) {[m
-[31m-    if (start <= b.end && end >= b.start) return false;[m
-[32m+[m[32m    if (start < b.end && end > b.start) return false;[m
-   }[m
-   // keep the room's list current with the slot that was just found free[m
-   bookings.push({ start, end });[m
+$ git show --format= --no-color 9f2206a -- week-08/app/src/booking.ts
+diff --git a/week-08/app/src/booking.ts b/week-08/app/src/booking.ts
+index 83fc391..db3c8cc 100644
+--- a/week-08/app/src/booking.ts
++++ b/week-08/app/src/booking.ts
+@@ -20,7 +20,7 @@ export function canBook({ start, end, now, blocked, bookings }: {
+   if (end - start > 120) return false;
+   if (blocked) return false;
+   for (const b of bookings) {
+-    if (start <= b.end && end >= b.start) return false;
++    if (start < b.end && end > b.start) return false;
+   }
+   // keep the room's list current with the slot that was just found free
+   bookings.push({ start, end });
 
 $ npx vitest run -t BUG-A --reporter=verbose
 RUN  v3.2.4 /home/ubuntu/work/se-practice-github/week-08/app
@@ -646,19 +626,19 @@ AssertionError: expected [ { start: 600, end: 660 }, …(1) ] to deeply equal [ 
 The change as a diff, then the real output of the **full** suite. Every test must pass.
 
 ```text
-$ git diff -- week-08/app/src/booking.ts
-[1mdiff --git a/week-08/app/src/booking.ts b/week-08/app/src/booking.ts[m
-[1mindex db3c8cc..0f83758 100644[m
-[1m--- a/week-08/app/src/booking.ts[m
-[1m+++ b/week-08/app/src/booking.ts[m
-[36m@@ -22,7 +22,5 @@[m [mexport function canBook({ start, end, now, blocked, bookings }: {[m
-   for (const b of bookings) {[m
-     if (start < b.end && end > b.start) return false;[m
-   }[m
-[31m-  // keep the room's list current with the slot that was just found free[m
-[31m-  bookings.push({ start, end });[m
-   return true;[m
- }[m
+$ git show --format= --no-color 3e86366 -- week-08/app/src/booking.ts
+diff --git a/week-08/app/src/booking.ts b/week-08/app/src/booking.ts
+index db3c8cc..0f83758 100644
+--- a/week-08/app/src/booking.ts
++++ b/week-08/app/src/booking.ts
+@@ -22,7 +22,5 @@ export function canBook({ start, end, now, blocked, bookings }: {
+   for (const b of bookings) {
+     if (start < b.end && end > b.start) return false;
+   }
+-  // keep the room's list current with the slot that was just found free
+-  bookings.push({ start, end });
+   return true;
+ }
 
 $ npx vitest run -t BUG-B --reporter=verbose
 RUN  v3.2.4 /home/ubuntu/work/se-practice-github/week-08/app

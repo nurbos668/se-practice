@@ -1,0 +1,46 @@
+# week-07/submission.yml — declaration for this lab.
+# Student identity and GitHub username supplied by Nurbolsyn; checker.commit is the recorded run.
+schema: 1
+week: "07"
+
+student:
+  name: "Nurbolsyn Tajikossov"
+  student_id: "24B030242"
+  github: "nurbos668"
+
+assistant:
+  tool: "ChatGPT via Manus"
+  model: "not displayed"
+
+project:
+  baseline: starter
+  bolt_url: not-shared
+  vitest: "3.2.4"
+
+counts:
+  tests_first: 15
+  tests_final: 17
+  first_run_failed: 1
+  review_decisions: 3
+  mutants_detected: 3
+
+checker:
+  pass: 33
+  fail: 0
+  error: 0
+  commit: "5684ae7"
+  known_fails: []
+
+assumptions:
+  invalid_existing_booking: returns-true
+
+review_findings:
+  - "T06: the first suite expected rejection at exactly 120 minutes, but AC2 allows that duration."
+  - "M2: T01 and T08 detect endpoint-touching mutations; AC4 allows touching endpoints."
+  - "app/src/booking.ts: a reversed existing booking returns true, and no AC defines this case."
+
+honesty:
+  first_suite_unedited: yes
+  outputs_unedited: yes
+  mutants_restored: yes
+  ai_usage_disclosed: yes

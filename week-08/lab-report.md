@@ -13,7 +13,7 @@ grader find your answers by them. You can add rows to any table, but never remov
 
 | | |
 | --- | --- |
-| Assistant I debugged with (tool) | ChatGPT via Manus |
+| Assistant I debugged with (tool) | Manus assistant |
 | Exact model (with its version, or `not displayed`) | not displayed |
 | Where the skill was installed (ChatGPT / Claude web / Claude Code / prompt-only simulation) | prompt-only simulation; not installed |
 | Where I ran the tests (Bolt terminal / my computer / Codespace) | Manus cloud sandbox, in `week-08/app/` |
@@ -322,7 +322,7 @@ One row per defect. At least **BUG-A and BUG-B**. "Suspected cause" is your hypo
 | The file is plain UTF-8 text, named exactly `SKILL.md` (not `SKILL.md.txt`) | yes |
 | The first and the closing YAML delimiter are exactly three hyphens: `---` | yes |
 | `name` is lowercase with hyphens, and `description` says WHEN to use it | yes |
-| I read the whole file once: no passwords, API keys or private student data | no — the assistant inspected it; student review is not confirmed |
+| I read the whole file once: no passwords, API keys or private student data | no |
 
 **The contents of `skills/bug-detector.zip`.** Paste the listing (Windows: open the ZIP and copy
 the paths; macOS/Linux: `unzip -l skills/bug-detector.zip`):
@@ -343,7 +343,7 @@ Screenshot of the result: `evidence/install.png`.
 
 <!-- Write below this line -->
 
-The ChatGPT Skills page opened at sign-in, so the ZIP was not installed. The fallback was a prompt-only simulation in a fresh Manus assistant context; the skill text was supplied as instructions, not loaded as an installed skill. The student has not confirmed reading the file. No genuine browser screenshot of the simulation was available, so E1 is reported as a known failure in §9.1 rather than replaced with a fabricated image.
+The ChatGPT Skills page opened at sign-in, so the ZIP was not uploaded or installed. The assistant wrote `SKILL.md` from the deck-provided text; the student did not hand-type it or confirm a review. The fallback was a prompt-only simulation in a fresh Manus assistant context, with the skill text supplied as instructions rather than loaded as an installed skill. No genuine browser screenshot of the simulation was available, so E1 is reported as a known failure in §9.1 rather than replaced with a fabricated image.
 
 ---
 
@@ -741,12 +741,15 @@ Use the same IDs as `known_fails` in `submission.yml`. Write `none` if the run i
 
 | Check | Why it stays |
 | --- | --- |
-| | |
+| E1 | The ChatGPT Skills page required sign-in, so no ZIP upload or genuine prompt-only screenshot was available. The prompt-only diagnosis was run in a fresh Manus assistant context; no screenshot was fabricated. |
 
 ### 9.2 One limitation of AI-assisted debugging
 
 <!-- Use something that actually happened in sections 5-8. 20 words or more. -->
--
+
+**AI-assisted draft; student review is not confirmed.**
+
+T01 failed before `bookings.push` because the endpoint check returned false, so the original AC5 test could not isolate BUG-B. The separate 800–860 test was needed to expose the mutation. The ChatGPT Skills page also required sign-in, which prevented uploading the ZIP and capturing a genuine screenshot of the prompt-only simulation.
 
 ---
 
@@ -760,4 +763,6 @@ Use the same IDs as `known_fails` in `submission.yml`. Write `none` if the run i
      separated BUG-B as a hypothesis instead of a fact, because step 4 told it to. BUG-B was only
      visible after the BUG-A patch: the AC5 test had been failing for the wrong reason." -->
 
-<!-- Write your conclusion below this line -->
+**AI-assisted draft; student review and signature are not confirmed.**
+
+The prompt-only simulation helped a little: both answers found BUG-A, but the skill answer separated the T01 evidence from the separate BUG-B issue more clearly. After the overlap comparison was changed, T01, T08 and BUG-A passed, while AC5 and BUG-B still failed because the function appended the new slot to the input list. Removing that mutation made all 19 tests pass, and the production build also succeeded. These runs prove the two defects in the supplied function and show that the regression tests catch them; they do not prove every booking case is covered or that a prompt-only simulation behaves like an installed skill.

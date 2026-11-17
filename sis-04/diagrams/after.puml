@@ -1,0 +1,28 @@
+' Final SIS 04 structure: data, rules, filtering and UI are separate.
+@startuml
+skinparam componentStyle rectangle
+component "main.tsx" as Main
+component "App.tsx" as App
+component "rooms.ts" as Rooms
+component "booking.ts" as Booking
+component "filter.ts" as Filter
+component "booking.test.ts" as Tests
+component "index.css" as CSS
+
+Main --> App : mounts
+Main --> CSS : imports
+App --> Rooms : ROOMS
+App --> Booking : checkRoom()
+App --> Filter : filterRooms()
+Booking --> Rooms : Room type
+Filter --> Rooms : Room type
+Tests --> Booking : canBook() / checkRoom()
+Tests --> Filter : filterRooms()
+Tests --> Rooms : fixed Room fixtures
+
+note right of App
+  Holds UI state and presentation only.
+  Catalog and availability/filter rules
+  live in their own modules.
+end note
+@enduml

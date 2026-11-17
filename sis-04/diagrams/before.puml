@@ -1,0 +1,20 @@
+' Baseline Week 08 structure before the SIS 04 extension.
+@startuml
+skinparam componentStyle rectangle
+component "main.tsx" as Main
+component "App.tsx" as App
+component "booking.ts" as Booking
+component "booking.test.ts" as Tests
+component "index.css" as CSS
+
+Main --> App : mounts
+Main --> CSS : imports
+App --> Booking : canBook()
+Tests --> Booking : regression tests
+
+note right of App
+  Two rooms, form state and result UI.
+  A page-level blocked flag is passed
+  separately from the selected room.
+end note
+@enduml

@@ -17,7 +17,7 @@
 | Assistant (tool) | Manus assistant |
 | Assistant model | not displayed |
 | Starting point | week-08 |
-| Baseline commit | pending until this baseline commit is created |
+| Baseline commit | 890351a |
 | Language (ts or js) | ts |
 | Vitest version | 3.2.4 |
 | Where I ran the tests | Manus cloud sandbox (Linux) |
@@ -47,7 +47,12 @@
      they do. A tree is fine:  src/App.tsx — the page, holds the rooms and the form … -->
 
 ```text
-(paste here)
+app/src/App.tsx — React page: two-room catalog, time inputs, global blocked checkbox, error/result state; calls canBook.
+app/src/booking.ts — pure canBook({start, end, now, blocked, bookings}) implementing AC1–AC5.
+app/src/booking.test.ts — 19 real Vitest regression tests for AC1–AC5 and earlier edge cases.
+app/src/index.css — page layout, result/error colors and one narrow-screen media query.
+app/src/main.tsx — mounts App and imports the stylesheet.
+app/package.json — React/Vite/TypeScript/Vitest dependencies and dev, test, build scripts.
 ```
 
 ### 2.2 The context message as sent
@@ -56,7 +61,24 @@
      (no login, payments, live APIs or database; fictional data only). Unedited. -->
 
 ```text
-(paste here)
+This is a fresh analysis-only assistant context for SIS #04. Do not edit any files and do not write code.
+
+Repository map from the unchanged Week 08 starting point:
+- `app/src/App.tsx`: React page; contains the two-room catalog, form state, current-time parsing, global `blocked` checkbox, validation/result handling, and calls `canBook` with the selected room's bookings.
+- `app/src/booking.ts`: pure `canBook` function implementing time validity, future-time, 120-minute limit, blocked flag and strict overlap check.
+- `app/src/booking.test.ts`: 19 real Vitest tests for AC1–AC5 and earlier regression cases.
+- `app/src/index.css`: basic flex layout with one mobile media query at 480px.
+- `app/src/main.tsx`: mounts `App` and imports CSS.
+- `app/package.json`: React, Vite, TypeScript and Vitest; `npm run dev`, `npm test`, `npm run build`.
+
+Observed baseline details: `App.tsx` has only two rooms (lines 10–13), keeps a single page-level `blocked` state (line 24 and checkbox near line 64), and contains both room data and UI logic. It also keeps `toMinutes`, display formatting, form validation and result state in the page. `booking.ts` is already a separate pure module. The baseline suite passed 19/19.
+
+Requirements:
+AC1 reject start >= end and requests in the past. AC2 maximum duration 120 minutes. AC3 blocked room unavailable. AC4 reject overlaps but allow endpoint-touching bookings. AC5 availability checking does not mutate booking data. AC6 clear responsive desktop/mobile feedback.
+F1 room capacity >= attendees. F2 room has ALL selected equipment. F3 blocked room never Available. F4 clear empty state when nothing matches. F5 switching selected room uses that room's own blocked status and bookings and refreshes result.
+At least four fictional rooms; modules named exactly `src/rooms.ts` (Room + ROOMS), `src/booking.ts` (`canBook` unchanged plus `checkRoom`), `src/filter.ts` (`filterRooms`), and UI with no room data or duplicated rules. At least 10 executable Vitest tests, preserving original AC1–AC5 and including F1–F5, B1–B6, and INT. No network, storage, login, payment, backend, live API, or added dependency unless necessary. Keep solution small. Blocked rooms may remain visible with a label or be hidden; choose one and explain.
+
+Please return: (1) at least three concrete maintainability risks with file/line evidence and priority; (2) a short, prioritised, small-step plan, baseline first and no code until the plan is committed; (3) one optional design decision and its tradeoff. Distinguish observed facts from assumptions. Do not propose a full rewrite or add libraries.
 ```
 
 ## 3. Codebase analysis (Task 1)
@@ -69,24 +91,28 @@
 
 | # | Risk | Where (file / function) | Evidence | Priority |
 | --- | --- | --- | --- | --- |
-| 1 | (write here) | (write here) | (write here) | High / Medium / Low |
-| 2 | (write here) | (write here) | (write here) | High / Medium / Low |
-| 3 | (write here) | (write here) | (write here) | High / Medium / Low |
+| 1 | The room catalog is too small and coupled to the page | `src/App.tsx:8–13` | `Room` and `ROOMS` are declared in the UI, and only two rooms exist; new catalog/filter requirements would expand the component. | High |
+| 2 | A page-level blocked flag can disagree with the selected room | `src/App.tsx:24, 48, 64` | `check()` passes one global `blocked` state while bookings come from the selected room, so F3/F5 are not represented by one room record. | High |
+| 3 | Invalid time order still produces a result | `src/App.tsx:42–49` | The page sets an error when `s >= e` but does not return; it then calls `canBook` and sets an Unavailable result too. | Medium |
+| 4 | A stale comment describes the old design | `src/App.tsx:4–6` | The comment says the availability decision lives inside the component although the file imports `canBook` from `booking.ts`. | Low |
 
 ### 3.2 Improvement plan — before editing
 
 <!-- Numbered, in the order you will do it, smallest safe step first. Written BEFORE you change
      code: the commit that adds this section comes before the commit that changes app/src. -->
 
-1. (write here)
-2. (write here)
-3. (write here)
+1. Keep the Week 08 baseline and AC1–AC5 suite. Before each new rule, add a deterministic test using a fixed room fixture, run it to see the failure, then implement only the needed module/function and rerun the full suite.
+2. Add `src/rooms.ts` with a `Room` type and four fictional rooms, each with its own ID, name, capacity, equipment, blocked status and bookings.
+3. Add pure `filterRooms` in `src/filter.ts` for capacity and all-required equipment; cover F1, F2, F4, B5 and B6 with tests.
+4. Add `checkRoom` to `src/booking.ts` without changing `canBook`; look up the selected room and call `canBook` with that room's own blocked flag and bookings. Test F3, F5 and INT, including an unknown ID.
+5. Make `App.tsx` coordinate the filters and selected room, keep blocked rooms visible with a label, clear stale results when inputs/room change, and return after invalid time input. Keep rules and catalog out of the UI.
+6. Finish responsive styling, `app/README.md`, before/after PlantUML diagrams and five real UI screenshots; run Vitest, build, checker and validator, and record only measured results.
 
 ### 3.3 One AI suggestion I rejected or modified
 
 | Suggestion (as the assistant made it) | Decision | Why — with the AC, F-rule, test or file behind it |
 | --- | --- | --- |
-| (write here) | Rejected / Modified | (write here) |
+| Put capacity and equipment checks inside `checkRoom` | Modified | Keep F1/F2 in `filterRooms`; `checkRoom` should only find the chosen room and call `canBook` with its own data, as README §7 specifies. This keeps the two responsibilities and their tests separate. |
 
 ## 4. Feature extension (Task 2)
 

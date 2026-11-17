@@ -316,7 +316,7 @@ No commands were run during this review.
 
 | Check | Why it still fails |
 | --- | --- |
-| (write here) | (write here) |
+| L10 | The required 200–300-word reflection must be in the student's own words. The student has not supplied it, so the assistant has left this section for the student rather than writing a personal reflection on their behalf. |
 
 ## 10. AI reflection (Task 6)
 
@@ -325,4 +325,4 @@ No commands were run during this review.
      incorrect? What did you personally verify? How did tests influence your engineering
      decisions? What would you improve next? -->
 
-(write here)
+Reserved for the student's own 200–300-word reflection. It must answer the five questions above; it has not been written by the assistant.

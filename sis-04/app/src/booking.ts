@@ -1,3 +1,5 @@
+import type { Room } from './rooms';
+
 export type Interval = { start: number; end: number };
 
 export type BookingRequest = {
@@ -23,4 +25,18 @@ export function canBook({ start, end, now, blocked, bookings }: {
     if (start < b.end && end > b.start) return false;
   }
   return true;
+}
+
+export function checkRoom(
+  rooms: Room[],
+  roomId: string,
+  request: { start: number; end: number; now: number },
+): boolean {
+  const room = rooms.find(candidate => candidate.id === roomId);
+  if (!room) return false;
+  return canBook({
+    ...request,
+    blocked: room.blocked,
+    bookings: room.bookings,
+  });
 }

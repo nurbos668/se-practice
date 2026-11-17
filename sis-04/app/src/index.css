@@ -1,14 +1,50 @@
-body { font-family: system-ui, sans-serif; margin: 0; background: #f5f7fa; color: #16233a; }
-.page { max-width: 760px; margin: 2rem auto; padding: 1.5rem; background: white; border-radius: 12px; }
-.row { display: flex; flex-wrap: wrap; gap: 1rem; }
-.row label { display: flex; flex-direction: column; gap: 0.25rem; font-size: 0.9rem; }
-.row label.inline { flex-direction: row; align-items: center; }
-button { margin-top: 1rem; padding: 0.6rem 1.2rem; border: 0; border-radius: 8px; background: #16233a; color: white; }
-.result { margin-top: 1rem; font-weight: 600; }
-.available { color: #2f8f84; }
-.unavailable { color: #c0392b; }
-.error { color: #c0392b; margin-top: 0.75rem; }
-@media (max-width: 480px) {
-  .page { margin: 0; border-radius: 0; }
-  .row { flex-direction: column; }
+* { box-sizing: border-box; }
+body { margin: 0; background: #f3f6fa; color: #18263a; font-family: system-ui, sans-serif; }
+button, input { font: inherit; }
+.page { width: min(900px, 100% - 2rem); margin: 2rem auto; }
+.page-header { margin-bottom: 1.25rem; }
+.eyebrow { margin: 0 0 .35rem; color: #176c68; font-size: .75rem; font-weight: 750; letter-spacing: .12em; }
+h1 { margin: 0; font-size: clamp(1.8rem, 5vw, 2.5rem); }
+.intro { margin: .5rem 0 0; color: #526174; }
+.panel { margin: 1rem 0; padding: 1.25rem; border: 1px solid #dfe6ef; border-radius: 14px; background: #fff; box-shadow: 0 4px 14px #18263a0a; }
+h2 { margin: 0 0 1rem; font-size: 1.15rem; }
+.attendees-field, .time-grid label { display: flex; flex-direction: column; gap: .4rem; color: #425269; font-size: .9rem; }
+.attendees-field { max-width: 180px; }
+input[type="number"], input[type="time"] { min-height: 42px; padding: .5rem .65rem; border: 1px solid #b9c6d5; border-radius: 8px; background: white; color: #18263a; }
+.equipment-field { margin: 1rem 0 0; padding: 0; border: 0; }
+.equipment-field legend { margin-bottom: .5rem; color: #425269; font-size: .9rem; }
+.equipment-options { display: flex; flex-wrap: wrap; gap: .65rem 1rem; }
+.check-option { display: inline-flex; align-items: center; gap: .45rem; color: #34445a; }
+.check-option input { width: 1rem; height: 1rem; accent-color: #176c68; }
+.section-heading { display: flex; align-items: center; gap: .6rem; }
+.section-heading h2 { margin-bottom: 0; }
+.count { display: inline-grid; min-width: 1.6rem; height: 1.6rem; place-items: center; border-radius: 999px; background: #e7f2f1; color: #176c68; font-size: .85rem; font-weight: 700; }
+.room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: .7rem; margin-top: 1rem; }
+.room-option { display: flex; align-items: flex-start; gap: .65rem; min-height: 78px; padding: .8rem; border: 1px solid #d7e0eb; border-radius: 10px; background: #fff; cursor: pointer; }
+.room-option.selected { border-color: #176c68; box-shadow: 0 0 0 1px #176c68; background: #f5fbfa; }
+.room-option input { margin: .2rem 0 0; accent-color: #176c68; }
+.room-copy { display: grid; gap: .3rem; min-width: 0; }
+.room-title { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem; }
+.room-meta { color: #5c6b7d; font-size: .83rem; line-height: 1.35; }
+.blocked-badge { padding: .12rem .45rem; border-radius: 999px; background: #fff0e8; color: #a13f16; font-size: .72rem; font-weight: 700; }
+.empty-state { margin: 1rem 0 0; padding: .9rem; border-radius: 8px; background: #f3f6fa; color: #425269; }
+.time-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .8rem; }
+.end-of-day { margin-top: .8rem; }
+button { margin-top: 1rem; min-height: 44px; padding: .65rem 1.1rem; border: 0; border-radius: 8px; background: #176c68; color: white; font-weight: 700; cursor: pointer; }
+button:hover:not(:disabled) { background: #115854; }
+button:disabled { cursor: not-allowed; opacity: .55; }
+.result { margin: 1rem 0 0; font-weight: 750; }
+.available { color: #176c68; }
+.unavailable, .error { color: #b33e34; }
+.bookings { margin-top: 1rem; padding-top: .9rem; border-top: 1px solid #e5eaf0; color: #526174; font-size: .9rem; }
+.bookings h3 { margin: 0 0 .4rem; color: #18263a; font-size: .95rem; }
+.bookings ul, .bookings p { margin: 0; padding-left: 1.15rem; }
+.bookings p { padding-left: 0; }
+footer { padding: .3rem 0 1.5rem; color: #68788b; font-size: .8rem; text-align: center; }
+@media (max-width: 560px) {
+  .page { width: 100%; margin: 0; padding: 1rem; }
+  .panel { padding: 1rem; border-radius: 12px; }
+  .time-grid { grid-template-columns: 1fr; }
+  .room-grid { grid-template-columns: 1fr; }
+  button { width: 100%; }
 }

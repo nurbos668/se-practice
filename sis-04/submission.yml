@@ -26,11 +26,11 @@ counts:
   exchanges: 3
 
 checker:
-  pass: 32
-  fail: 1
+  pass: 33
+  fail: 0
   error: 0
-  commit: "d8f0669"
-  known_fails: [L10]
+  commit: "f7a8414"
+  known_fails: []
 
 review_findings:
   - "F2: filterRooms requires every selected equipment item; the F2 test excludes rooms missing a selection."

@@ -198,8 +198,8 @@ npm run build
 
  Test Files  1 passed (1)
       Tests  27 passed (27)
-   Start at  10:06:04
-   Duration  270ms (transform 37ms, setup 0ms, collect 35ms, tests 5ms, environment 0ms, prepare 56ms)
+   Start at  10:08:35
+   Duration  240ms (transform 37ms, setup 0ms, collect 36ms, tests 5ms, environment 0ms, prepare 40ms)
 ```
 
 ## 7. Quality evaluation (Task 5)

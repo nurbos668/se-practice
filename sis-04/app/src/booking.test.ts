@@ -25,7 +25,8 @@ const FIXED_ROOMS: Room[] = [
 const baseRequest = { start: 660, end: 720, now: 540 };
 
 test('T01 B3 AC4: a request touching the booking after it is available', () => {
-  expect(decide(660, 720)).toBe(true);
+  const available = canBook({ start: 660, end: 720, now: 540, blocked: false, bookings: [{ start: 600, end: 660 }] });
+  expect(available).toBe(true);
 });
 
 test('T02 AC1: a request starting at the current time is unavailable', () => {
@@ -45,11 +46,13 @@ test('T05 AC1: an interval ending after midnight is unavailable', () => {
 });
 
 test('T06 B1 AC2: exactly 120 minutes is available', () => {
-  expect(decide(720, 840)).toBe(true);
+  const available = canBook({ start: 720, end: 840, now: 540, blocked: false, bookings: [{ start: 600, end: 660 }] });
+  expect(available).toBe(true);
 });
 
 test('T07 B2 AC2: a 121-minute booking is unavailable', () => {
-  expect(decide(720, 841)).toBe(false);
+  const available = canBook({ start: 720, end: 841, now: 540, blocked: false, bookings: [{ start: 600, end: 660 }] });
+  expect(available).toBe(false);
 });
 
 test('T08 AC4: a request touching the booking before it is available', () => {
@@ -57,7 +60,8 @@ test('T08 AC4: a request touching the booking before it is available', () => {
 });
 
 test('T09 B4 AC4: a partial overlap is unavailable', () => {
-  expect(decide(630, 690)).toBe(false);
+  const available = canBook({ start: 630, end: 690, now: 540, blocked: false, bookings: [{ start: 600, end: 660 }] });
+  expect(available).toBe(false);
 });
 
 test('T10 AC4: a request containing an existing booking is unavailable', () => {

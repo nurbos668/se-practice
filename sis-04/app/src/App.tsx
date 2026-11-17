@@ -113,7 +113,14 @@ export default function App() {
                   checked={selectedRoom?.id === room.id}
                   onChange={() => {
                     setRoomId(room.id);
-                    clearFeedback();
+                    setError('');
+                    setResult(result !== null && now && start && (end || endOfDay)
+                      ? checkRoom(ROOMS, room.id, {
+                          start: toMinutes(start),
+                          end: endOfDay ? 1440 : toMinutes(end),
+                          now: toMinutes(now),
+                        })
+                      : null);
                   }}
                 />
                 <span className="room-copy">

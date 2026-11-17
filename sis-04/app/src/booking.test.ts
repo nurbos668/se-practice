@@ -135,6 +135,10 @@ test('F4: no matching room returns an empty list', () => {
   expect(filterRooms(FIXED_ROOMS, { attendees: 25, equipment: [] })).toEqual([]);
 });
 
+test('F5: an unknown room id is unavailable', () => {
+  expect(checkRoom(FIXED_ROOMS, 'missing-room', baseRequest)).toBe(false);
+});
+
 test('F3: a blocked selected room is never available', () => {
   expect(checkRoom(FIXED_ROOMS, 'c310', baseRequest)).toBe(false);
 });

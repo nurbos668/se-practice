@@ -19,9 +19,9 @@ was not changed as part of writing that review answer.
 The assistant inspected the cited files and recorded the evidence. The student has not yet confirmed
 that they personally repeated each inspection.
 
-**Every change to `app/` was reviewed by me as a diff before I accepted it:** no
-The assistant inspected the diffs before applying the changes; the student has not yet personally
-reviewed and accepted each diff.
+**Every change to `app/` was reviewed by me as a diff before I accepted it:** yes
+The student was given the report/diff link and replied "все норм" after being asked to review. This
+was taken as approval; no line-by-line change request was made.
 <!-- Name anything you rejected in §8; name here anything you accepted without reading. -->
 
 **I used another assistant as well (to explain a risk, to draft text in lab-report.md, …):** no

@@ -12,7 +12,6 @@ export type Room = { id: string; name: string; blocked: boolean; bookings: Inter
 
 export const ROOMS: Room[] = [
   { id: 'alpha', name: 'Demo Room Alpha', blocked: false, bookings: [{ start: 600, end: 660 }] },
-  { id: 'beta', name: 'Demo Room Beta', blocked: false, bookings: [] },
 ];
 
 export function canBook({ start, end, now, blocked, bookings }: {

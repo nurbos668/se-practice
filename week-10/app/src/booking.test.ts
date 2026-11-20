@@ -1,5 +1,5 @@
 import { expect, test } from 'vitest';
-import { canBook, type BookingRequest } from './booking';
+import { canBook, ROOMS, type BookingRequest } from './booking';
 
 function decide(start: number, end: number, changes: Partial<BookingRequest> = {}) {
   return canBook({
@@ -94,6 +94,11 @@ test('BUG-A: a request touching two adjacent bookings is available', () => {
   const available = canBook({ start: 660, end: 720, now: 540, blocked: false, bookings });
 
   expect(available).toBe(true);
+});
+
+test('R2 scope: only one fictional room is configured', () => {
+  expect(ROOMS).toHaveLength(1);
+  expect(ROOMS[0].name).toMatch(/demo/i);
 });
 
 test('BUG-B: an available request leaves the booking data unchanged', () => {

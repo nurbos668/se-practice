@@ -491,7 +491,7 @@ Not run. The required background-agent rules are listed in §9.1; no second chec
 
 | Check | Why it stays |
 | --- | --- |
-| none | The final checker run is expected to have no FAIL or ERROR after adding the student's own conclusion. |
+| none | The final checker run has 31 PASS, 0 FAIL and 0 ERROR after adding the student's own conclusion. |
 
 ---
 

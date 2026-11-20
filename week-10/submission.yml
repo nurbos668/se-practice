@@ -1,0 +1,52 @@
+# week-10/submission.yml — facts from the current working tree.
+schema: 1
+week: "10"
+
+student:
+  name: "Nurbolsyn Tajikossov"
+  student_id: "24B030242"
+  github: "nurbos668"
+
+assistant:
+  tool: "Manus chat assistant"
+  model: "not displayed"
+  environment: "chat"
+
+project:
+  starting_point: "week-08"
+  baseline_commit: "f05d838"
+  language: "ts"
+  vitest: "3.2.4"
+
+counts:
+  claims_challenged: 6
+  risks_registered: 5
+  risks_confirmed: 5
+  tests_final: 20
+  agents_lines_changed: 7
+
+audit:
+  level: 0
+
+decision:
+  top_two: [R1, R2]
+  mitigated: [R1, R2]
+  release: "conditional"
+
+checker:
+  pass: 31
+  fail: 0
+  error: 0
+  commit: "416ad44"
+  known_fails: []
+
+review_findings:
+  - "R1: app/AGENTS.md originally permitted real timetable data, login/database additions, and production deployment."
+  - "R2: src/App.tsx initially configured two rooms; the regression test failed because one-room scope expected one."
+  - "R3: package-lock.json resolved development dependencies with five npm audit advisories; upgrades remain unreviewed."
+
+honesty:
+  review_was_read_only: "yes"
+  agents_patch_approved_by_me: "yes"
+  outputs_unedited: "yes"
+  ai_usage_disclosed: "yes"
